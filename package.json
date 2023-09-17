@@ -5,6 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "nodemon src/index.ts",
+    "docker:db:up": "docker-compose -f docker/mongodb.yml up -d",
+    "docker:db:down": "docker-compose -f docker/mongodb.yml down",
     "start": "npm run build && node ./dist/index.js",
     "build": "tsc",
     "prettier": "prettier --write \"src/**/*.{ts,css,js,html}\"",

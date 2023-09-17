@@ -22,6 +22,16 @@ This repository contains the backend code for the Da Vinci Renaissance website.
 
 **Starting the app every time:**
 
+1. If you're on Windows, open Docker Desktop.
+
+1. CD to the project directory.
+
+1. Run the following to start the database:
+
+    ```
+    npm run docker:db:up
+    ```
+
 1. Run the following to start the development server:
     ```
     npm run dev
@@ -33,6 +43,13 @@ This repository contains the backend code for the Da Vinci Renaissance website.
 **Stopping the app:**
 
 1. Type `Ctrl+C` in the terminal with the server to stop the server.
+
+1. In Docker Desktop, you can press the Stop button to stop a container and persist its data. Pressing the Delete button will stop a container and delete its data. You can also delete Dabble's db container with the following command:
+
+    ```
+    npm run docker:db:down
+    ```
+
 
 **Helpful tools:**
 
