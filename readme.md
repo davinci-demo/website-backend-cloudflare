@@ -48,6 +48,7 @@ This repository contains the backend code for the Da Vinci Renaissance website.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 **server address**: _localhost or the server's IP address_
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 **port**: _27017_ (unless modified in the mongodb.yml file)
 
