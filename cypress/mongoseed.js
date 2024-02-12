@@ -1,4 +1,4 @@
-import User from "../src/models/User"
+import User from "../src/models/User.ts"
 
 const mongoose = require("mongoose");
 
