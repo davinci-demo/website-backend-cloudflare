@@ -61,9 +61,11 @@ jobs:
           name: build
           path: dist
 
-      #TODO add test data into mongo db
-      #- name: Seed mongo
-      #  run: mongo 127.0.0.1/path/postman/setup.js
+      # add test data into mongo db
+      - name: "Mongo Seed Data"
+        run: node cypress/mongoseed.ts
+        env:
+          MONGODB_URI: "mongodb://admin:admin@127.0.0.1:27017/APP-DATABASE"
 
       - name: "Start API service"
         uses: cypress-io/github-action@v6
@@ -72,6 +74,8 @@ jobs:
           start: node ./dist/index.js
           wait-on: "http://localhost:8000"
           wait-on-timeout: 120
+        env:
+          MONGODB_URI: "mongodb://admin:admin@127.0.0.1:27017/APP-DATABASE"
 
       - name: Newman setup
         run: npm install -g newman
