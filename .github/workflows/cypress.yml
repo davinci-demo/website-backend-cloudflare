@@ -76,7 +76,7 @@ jobs:
       - name: Newman setup
         run: npm install -g newman
       - name: Run Postman collection
-        run:  newman run "cypress/collection.postman.json"
+        run:  newman run "cypress/DaVinci.postman_collection.json"
         env:
           NODE_ENV: "develop"
 
