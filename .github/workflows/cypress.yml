@@ -65,7 +65,7 @@ jobs:
       - name: "Mongo Seed Data"
         run: |
           echo '{"type": "module"}' > cypress/package.json
-          node cypress/mongoseed.ts
+          node cypress/mongoseed.js
         env:
           MONGODB_URI: "mongodb://admin:admin@127.0.0.1:27017/APP-DATABASE"
 
