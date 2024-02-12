@@ -30,6 +30,49 @@ jobs:
           if-no-files-found: error
           path: dist
 
+  contract-tests:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:4.4.15
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: admin
+          MONGO_INITDB_DATABASE: APP-DATABASE
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    needs: install
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Newman setup
+        run: npm install -g newman
+
+      - name: Download the build folders
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: dist
+
+      #TODO add test data into mongo db
+      #- name: Seed mongo
+      #  run: mongo 127.0.0.1/path/postman/setup.js
+
+      - name: Run Postman collection
+        run: |
+          node ./dist/index.js &
+          sleep 60
+          newman run "cypress/collection.postman.json"
+        env:
+          NODE_ENV: "develop"
+
   api-tests:
     timeout-minutes: 15
     runs-on: ubuntu-latest
@@ -50,7 +93,7 @@ jobs:
     container:
       image: cypress/browsers:node-20.9.0-chrome-118.0.5993.88-1-ff-118.0.2-edge-118.0.2088.46-1
       options: --user 1001
-    needs: install
+    needs: contract-tests
     steps:
       - name: Checkout
         uses: actions/checkout@v4
