@@ -64,9 +64,9 @@ jobs:
       # add test data into mongo db
       - name: "Mongo Seed Data"
         run: |
+          ##npm i -D typescript
+          ##npx tsc src/models/User.ts --outfile cypress/compileduser.js --module system
           echo '{"type": "module"}' > cypress/package.json
-          npm i -D typescript
-          npx tsc src/models/User.ts --outfile cypress/compileduser.js --module system
           node cypress/mongoseed.js
         env:
           MONGODB_URI: "mongodb://admin:admin@127.0.0.1:27017/APP-DATABASE"
