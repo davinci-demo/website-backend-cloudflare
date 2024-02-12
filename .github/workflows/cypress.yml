@@ -47,13 +47,15 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
+    container:
+      image: cypress/browsers:node-20.9.0-chrome-118.0.5993.88-1-ff-118.0.2-edge-118.0.2088.46-1
+      options: --user 1001
     needs: install
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Newman setup
-        run: npm install -g newman
+      - name: Cypress setup
+        run: npm install cypress --save-dev
 
       - name: Download the build folders
         uses: actions/download-artifact@v3
@@ -65,11 +67,17 @@ jobs:
       #- name: Seed mongo
       #  run: mongo 127.0.0.1/path/postman/setup.js
 
+      - name: "Start API service"
+        uses: cypress-io/github-action@v6
+        with:
+          start: node ./dist/index.js
+          wait-on: "http://localhost:8000"
+          wait-on-timeout: 120
+
+      - name: Newman setup
+        run: npm install -g newman
       - name: Run Postman collection
-        run: |
-          node ./dist/index.js &
-          sleep 60
-          newman run "cypress/collection.postman.json"
+        run:  newman run "cypress/collection.postman.json"
         env:
           NODE_ENV: "develop"
 
