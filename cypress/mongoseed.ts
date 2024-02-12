@@ -1,5 +1,5 @@
+import User from '../src/models/User'
 
-const User = require( '../src/models/User' );
 const mongoose = require('mongoose');
 
 const MONGODB_URI = process.env.MONGODB_URI;
