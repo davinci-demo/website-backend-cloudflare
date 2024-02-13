@@ -78,7 +78,7 @@ jobs:
           ./mongosh-2.1.4-linux-x64/bin/mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin <<EOF
             db = db.getSiblingDB('DV-DB');
             const resultset = db.user.find({});
-            print resultset;
+            print( resultset );
           EOF
 
         env:
