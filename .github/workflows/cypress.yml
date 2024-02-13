@@ -23,13 +23,6 @@ jobs:
           runTests: false
           build: npm run build
 
-      - name: "Download Mongo Shell"
-        run: |
-          apt update && apt install -y curl
-          curl -sSL https://downloads.mongodb.com/compass/mongosh-2.1.4-linux-x64.tgz --output mongosh.tgz
-          tar xzf mongosh.tgz
-          mv mongosh-2.1.4-linux-x64/bin dist/mongosh
-
       - name: Save build folder
         uses: actions/upload-artifact@v3
         with:
@@ -68,6 +61,12 @@ jobs:
           name: build
           path: dist
 
+      - name: "Download Mongo Shell"
+        run: |
+          ##apt update && apt install -y curl
+          curl -sSL https://downloads.mongodb.com/compass/mongosh-2.1.4-linux-x64.tgz --output mongosh.tgz
+          tar xzf mongosh.tgz -C /opt
+          sudo ln -s /opt/mongosh-2.1.4-linux-x64/bin/mongosh /usr/bin/mongosh
       - name: "Mongo Seed Data"
         run: |
           sudo ln -s dist/mongosh/mongosh /usr/bin/mongosh
