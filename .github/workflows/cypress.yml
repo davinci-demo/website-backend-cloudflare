@@ -70,6 +70,9 @@ jobs:
             db = db.getSiblingDB('DV-DB');
             db.createUser({ user: 'DV-TESTER', pwd: 'DV-PASSWORD', roles: [{ role: 'readWrite', db: 'DV-DB' }] })
             db.createCollection('user');
+            db.createCollection('course');
+            db.createCollection('enrollment');
+            db.createCollection('roles');
           EOF
           ./mongosh-2.1.4-linux-x64/bin/mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin --file cypress/mongoseed.js
         env:

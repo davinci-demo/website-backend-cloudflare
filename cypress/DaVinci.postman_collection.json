@@ -383,6 +383,32 @@
 					"item": [
 						{
 							"name": "list Users",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function(){",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"The response has all expected properties\", () => {",
+											"    const responseJson = pm.response.json();",
+											"    pm.expect(responseJson.type).to.eql('success');",
+											"    pm.expect(responseJson.value).to.not.be.empty;",
+											"    const one = responseJson.value[0];",
+											"    pm.expect(one.name.first).to.be.a('string');",
+											"    pm.expect(one.name.last).to.be.a('string');",
+											"    pm.expect(one.email).to.be.a('string');",
+											"    pm.expect(one.created).to.be.a('date');",
+											"    pm.expect(one.updated).to.be.a('date');",
+											"    pm.expect(one.role.name).to.be.a('string');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
