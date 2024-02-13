@@ -1,6 +1,6 @@
 
-const MONGODB_URI = process.env.MONGODB_URI;
-db = connect( MONGODB_URI );
+////const MONGODB_URI = process.env.MONGODB_URI;
+db = connect( 'mongodb://localhost:27017/APP-DATABASE' );
 
 // generate one record
 const accumulator = [];
