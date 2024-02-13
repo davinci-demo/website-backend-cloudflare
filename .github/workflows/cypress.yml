@@ -65,7 +65,7 @@ jobs:
         run: |
           curl -sSL https://downloads.mongodb.com/compass/mongosh-2.1.4-linux-x64.tgz --output mongosh.tgz
           tar xzf mongosh.tgz
-          ./mongosh-2.1.4-linux-x64/bin/mongosh --file cypress/mongoseed.js -u admin -p admin
+          ./mongosh-2.1.4-linux-x64/bin/mongosh --file cypress/mongoseed.js -u admin -p admin --authenticationDatabase admin
         env:
           MONGODB_URI: "mongodb://admin:admin@127.0.0.1:27017/APP-DATABASE"
 
