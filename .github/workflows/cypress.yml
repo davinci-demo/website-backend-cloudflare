@@ -25,7 +25,7 @@ jobs:
 
       - name: "Download Mongo Shell"
         run: |
-          sudo apt update && sudo apt install -y curl
+          apt update && apt install -y curl
           curl -sSL https://downloads.mongodb.com/compass/mongosh-2.1.4-linux-x64.tgz --output mongosh.tgz
           tar xzf mongosh.tgz
           mv mongosh-2.1.4-linux-x64/bin dist/mongosh
