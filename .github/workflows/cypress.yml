@@ -23,6 +23,12 @@ jobs:
           runTests: false
           build: npm run build
 
+      - name: "Download Mongo Shell"
+        run: |
+          curl -sSL https://downloads.mongodb.com/compass/mongosh-2.1.4-linux-x64.tgz --output mongosh.tgz
+          tar xzf mongosh.tgz
+          mv mongosh-2.1.4-linux-x64/bin dist/mongosh
+
       - name: Save build folder
         uses: actions/upload-artifact@v3
         with:
@@ -61,14 +67,10 @@ jobs:
           name: build
           path: dist
 
-
       - name: "Mongo Seed Data"
         run: |
-          curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-          sudo apt update && sudo apt install -y mongodb-org-shell
-          which mongosh
-          ##mongosh --file cypress/mongoseed.js
+          sudo ln -s dist/mongosh/mongosh /usr/bin/mongosh
+          mongosh --file cypress/mongoseed.js
         env:
           MONGODB_URI: "mongodb://admin:admin@127.0.0.1:27017/APP-DATABASE"
 
