@@ -68,8 +68,7 @@ jobs:
 ##          sudo ln -s /opt/mongosh-2.1.4-linux-x64/bin/mongosh /usr/bin/mongosh
       - name: "Mongo Seed Data"
         run: |
-          sudo ln -s dist/mongosh/mongosh /usr/bin/mongosh
-          sudo /usr/bin/mongosh --file cypress/mongoseed.js
+          /usr/bin/mongosh --file cypress/mongoseed.js
         env:
           MONGODB_URI: "mongodb://admin:admin@127.0.0.1:27017/APP-DATABASE"
 
