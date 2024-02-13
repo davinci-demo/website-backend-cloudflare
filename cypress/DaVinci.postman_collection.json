@@ -394,8 +394,6 @@
 											"",
 											"pm.test(\"The response has all expected properties\", () => {",
 											"    const responseJson = pm.response.json();",
-											"",
-											"    pm.expect(responseJson).to.not.be.empty;",
 											"    const one = responseJson[0];",
 											"    pm.expect(one.name.first).to.be.a('string');",
 											"    pm.expect(one.name.last).to.be.a('string');",
