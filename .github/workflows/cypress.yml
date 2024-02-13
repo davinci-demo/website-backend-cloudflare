@@ -75,6 +75,12 @@ jobs:
             db.createCollection('roles');
           EOF
           ./mongosh-2.1.4-linux-x64/bin/mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin --file cypress/mongoseed.js
+          ./mongosh-2.1.4-linux-x64/bin/mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin <<EOF
+            db = db.getSiblingDB('DV-DB');
+            const resultset = db.user.find({});
+            print resultset;
+          EOF
+
         env:
           MONGODB_URI: "mongodb://DV-TESTER:DV-PASSWORD@127.0.0.1:27017/DV-DB"
 
