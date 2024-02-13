@@ -61,13 +61,19 @@ jobs:
           name: build
           path: dist
 
+
       - name: "Mongo Seed Data"
         run: |
           curl -sSL https://downloads.mongodb.com/compass/mongosh-2.1.4-linux-x64.tgz --output mongosh.tgz
           tar xzf mongosh.tgz
-          ./mongosh-2.1.4-linux-x64/bin/mongosh --file cypress/mongoseed.js -u admin -p admin --authenticationDatabase admin
+          ./mongosh-2.1.4-linux-x64/bin/mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin <<EOF
+            db = db.getSiblingDB('DV-DB');
+            db.createUser({ user: 'DV-TESTER', pwd: 'DV-PASSWORD', roles: [{ role: 'readWrite', db: 'DV-DB' }] })
+            db.createCollection('user');
+          EOF
+          ./mongosh-2.1.4-linux-x64/bin/mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin --file cypress/mongoseed.js
         env:
-          MONGODB_URI: "mongodb://admin:admin@127.0.0.1:27017/APP-DATABASE"
+          MONGODB_URI: "mongodb://DV-TESTER:DV-PASSWORD@127.0.0.1:27017/DV-DB"
 
       - name: "Start API service"
         uses: cypress-io/github-action@v6
@@ -77,7 +83,8 @@ jobs:
           wait-on: "http://localhost:8000"
           wait-on-timeout: 120
         env:
-          MONGODB_URI: "mongodb://admin:admin@127.0.0.1:27017/APP-DATABASE"
+          MONGODB_URI: "mongodb://DV-TESTER:DV-PASSWORD@127.0.0.1:27017/DV-DB"
+
 
       - name: Newman setup
         run: npm install -g newman

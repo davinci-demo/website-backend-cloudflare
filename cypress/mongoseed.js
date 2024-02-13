@@ -1,6 +1,7 @@
 
 ////const MONGODB_URI = process.env.MONGODB_URI;
-db = connect( 'mongodb://localhost:27017/APP-DATABASE' );
+////db = connect( MONGODB_URI);
+const db = connect( 'mongodb://DV-TESTER:DV-PASSWORDlocalhost:27017/DV-DB' );
 
 // generate one record
 const accumulator = [];
@@ -18,5 +19,5 @@ accumulator.push({
       role,
     });
 
-db.users.insertMany( accumulator );
+db.user.insertMany( accumulator );
 
