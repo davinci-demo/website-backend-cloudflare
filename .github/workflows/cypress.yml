@@ -30,6 +30,78 @@ jobs:
           if-no-files-found: error
           path: dist
 
+  contract-tests:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:4.4.15
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: admin
+          MONGO_INITDB_DATABASE: APP-DATABASE
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    needs: install
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Cypress setup
+        run: npm install cypress --save-dev
+
+      - name: Download the build folders
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: dist
+
+
+      - name: "Mongo Seed Data"
+        run: |
+          curl -sSL https://downloads.mongodb.com/compass/mongosh-2.1.4-linux-x64.tgz --output mongosh.tgz
+          tar xzf mongosh.tgz
+          ./mongosh-2.1.4-linux-x64/bin/mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin <<EOF
+            db = db.getSiblingDB('DV-DB');
+            db.createUser({ user: 'DV-TESTER', pwd: 'DV-PASSWORD', roles: [{ role: 'readWrite', db: 'DV-DB' }] })
+            db.createCollection('user');
+            db.createCollection('course');
+            db.createCollection('enrollment');
+            db.createCollection('roles');
+          EOF
+          ./mongosh-2.1.4-linux-x64/bin/mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin --file cypress/mongoseed.js
+          ./mongosh-2.1.4-linux-x64/bin/mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin <<EOF
+            db = db.getSiblingDB('DV-DB');
+            const resultset = db.user.find({});
+            print( resultset );
+          EOF
+
+        env:
+          MONGODB_URI: "mongodb://DV-TESTER:DV-PASSWORD@127.0.0.1:27017/DV-DB"
+
+      - name: "Start API service"
+        uses: cypress-io/github-action@v6
+        with:
+          runTests: false
+          start: node ./dist/index.js
+          wait-on: "http://localhost:8000"
+          wait-on-timeout: 120
+        env:
+          MONGODB_URI: "mongodb://DV-TESTER:DV-PASSWORD@127.0.0.1:27017/DV-DB"
+
+
+      - name: Newman setup
+        run: npm install -g newman
+      - name: Run Postman collection
+        run:  newman run "cypress/DaVinci.postman_collection.json"
+        env:
+          NODE_ENV: "develop"
+
   api-tests:
     timeout-minutes: 15
     runs-on: ubuntu-latest
@@ -50,7 +122,7 @@ jobs:
     container:
       image: cypress/browsers:node-20.9.0-chrome-118.0.5993.88-1-ff-118.0.2-edge-118.0.2088.46-1
       options: --user 1001
-    needs: install
+    needs: contract-tests
     steps:
       - name: Checkout
         uses: actions/checkout@v4
