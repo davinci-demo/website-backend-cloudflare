@@ -1,68 +1,45 @@
-import { Request, Response, NextFunction } from 'express';
-const express = require('express');
-const dotenv = require('dotenv');
+import { fromHono } from "chanfana";
+import { Hono } from "hono";
 
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import compress from 'compression'
-import cors from 'cors';
-import helmet from 'helmet';
+//import { TaskDelete } from "./endpoints/taskDelete";
+//import { TaskFetch } from "./endpoints/taskFetch";
+import { CreateUser, GetUser, ListUsers } from "./endpoints/users";
+import { CreateLesson, GetLesson, ListLessons } from "./endpoints/lessons";
+import { CreateCourse, GetCourse, ListCourses } from "./endpoints/courses";
 
-import authRouter from './routes/auth.routes';
-import courseRouter from './routes/course.routes';
-import enrollmentRouter from './routes/enrollment.routes';
-import userRouter from './routes/users.routes';
-import { connectDB } from './config/database';
+type Bindings = {
+ DB: D1Database
+ DEMO_API_KEY: string
+}
+// Start a Hono app
+const app = new Hono<{ Bindings: Bindings }>()
 
-dotenv.config();
-
-const app = express();
-const port = process.env.PORT || 8000;
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
-app.use(compress());
-app.use(helmet());
-app.use(cors());
-
-app.use('/api', (req: Request, res: Response, next: NextFunction) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  next();
-})
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Davinci API Backend Works');
+// Setup OpenAPI registry
+const openapi = fromHono(app, {
+	docs_url: "/",
 });
 
-// Connect to database
-connectDB();
+// API Key Authentication Middleware
+const apiKeyAuthMiddleware = async (c, next) => {
+    const apiKey = c.req.header('X-API-Key');
+    if (!apiKey || apiKey !== c.env.DEMO_API_KEY) { // Validate against API_KEY environment variable
+        throw new HTTPException(401, { message: 'Invalid API Key.' })
+    }
+    await next();
+};
 
-// app routers
-app.use('/api/users', userRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/courses', courseRouter);
-app.use('/api/enrollment', enrollmentRouter);
+// Register OpenAPI endpoints
+//openapi.get("/api/tasks/:taskSlug", TaskFetch);
+//openapi.delete("/api/tasks/:taskSlug", TaskDelete);
+openapi.get("/api/users", apiKeyAuthMiddleware, ListUsers);
+openapi.post("/api/users", CreateUser);
+openapi.get("/api/users/:id", GetUser);
+openapi.get("/api/lessons", ListLessons);
+openapi.post("/api/lessons", CreateLesson);
+openapi.get("/api/lessons/:id", GetLesson);
+openapi.get("/api/courses", ListCourses);
+openapi.post("/api/courses", CreateCourse);
+openapi.get("/api/courses/:id", GetCourse);
 
-/* 
- * app.get('*', (req: Request, res: Response) => {
- *   return handle(req, res);
- * })
- */
-
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (err.name === "UnauthorizedError") {
-    res.status(401).json({"error": err.name + ": " + err.message})
-  } else if (err) {
-    res.status(400).json({"error": err.name + ": " + err.message})
-    console.log(err)
-  }
-})
-
-app.listen(port, () => {
-  console.log(`🚀 Server is running at http://localhost:${port}`);
-});
-
+// Export the Hono app
 export default app;
